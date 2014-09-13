@@ -1,11 +1,11 @@
 <?php
-$config['sitename']          = 'VIPO';
-$config['sitedescription']   = 'VIPO Software de administración hotelera';
-$config['author']            = 'Ing. Daniel POmalaza e Ing. Victor Fajardo';
-$config['owner']             = 'VIPO';
+$config['sitename']          = 'Postula en Computrabajo';
+$config['sitedescription']   = 'herramienta que te ayudará a encontrar trabajo por medio de computrabajo';
+$config['author']            = 'Ing. Daniel Pomalaza';
+$config['owner']             = 'Daniel Pomalaza';
 
 $config['mailSender']        = "daniel.pomalaza@mdp.com.pe";
-$config['mailSenderName']    = "VIPO";
+$config['mailSenderName']    = "Postula";
 $config['mailSMTPUser']      = "daniel.pomalaza@mdp.com.pe";
 $config['mailSMTPPassword']  = "lima123";
 $config['mailSMTPPort']      = "25";
