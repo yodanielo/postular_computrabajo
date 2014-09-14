@@ -40,6 +40,7 @@
 
 $route['default_controller'] = "postulacion";
 $route['404_override'] = '';
+$route['403_override'] = 'user/login';
 
 
 /* End of file routes.php */

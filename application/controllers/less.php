@@ -13,7 +13,7 @@
 class less extends padre{
     function index($file){
         $this->load->library("lessc");
-        $this->lessc->pcompile(APPPATH."css/$file");
+        $this->lessc->pcompile(APPPATH."../css/$file");
     }
 }
 

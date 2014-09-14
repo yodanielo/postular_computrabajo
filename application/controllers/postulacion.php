@@ -6,7 +6,9 @@ if (!defined('BASEPATH'))
 class Postulacion extends Padre {
 
     public function index() {
-        $this->loadHTML("listado");
+        //$this->check_auth();
+        $this->params["css_after"][]="home.less";
+        $this->loadHTML("postulacion/home");
     }
 
 }

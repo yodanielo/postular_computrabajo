@@ -1,0 +1,30 @@
+@import "elements.less";
+@path:"../../img";
+
+#cuerpototal{
+    #barraprincipal{
+        margin-bottom: 0px;
+    }
+    #cuerpohome{
+        background: url(@{path}/background_home.png) no-repeat 50% 0px;
+        position: relative;
+        height: 654px;
+
+        #formulario_registro {
+            padding: 30px;
+            margin: 30px;
+            max-width: 600px;
+            .rounded(5px);
+            .bw-rgba(0,51,102,0.5);
+            .hmoption{
+                span{
+                    display: none;
+                }
+                .btn.active span{
+                    display:inline-block!important;
+                    margin-right: 10px;
+                }
+            }
+        }
+    }
+}
