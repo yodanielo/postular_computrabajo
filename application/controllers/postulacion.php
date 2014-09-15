@@ -7,7 +7,8 @@ class Postulacion extends Padre {
 
     public function index() {
         //$this->check_auth();
-        $this->params["css_after"][]="home.less";
+        $this->params["css_after"][]="home.css";
+        $this->params["scripts"][]="registrar.js";
         $this->loadHTML("postulacion/home");
     }
 

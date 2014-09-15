@@ -1,0 +1,11 @@
+img {
+  border: none;
+  padding: 0px;
+  margin: 0px;
+}
+.navbar-brand {
+  height: auto;
+}
+.navbar-default .navbar-nav > li > a {
+  font-size: 1.5em;
+}

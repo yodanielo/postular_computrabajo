@@ -3,25 +3,25 @@
         <form role="form" class="form-group">
             <div class="row">
                 <div class="form-group col-md-6">
-                    <input type="text" class="form-control input-lg" id="txtNombre" placeholder="Nombre">
+                    <input type="text" class="form-control input-lg required" id="txtNombre" placeholder="Nombre">
                 </div>
                 <div class="form-group col-md-6">
-                    <input type="text" class="form-control input-lg" id="txtApellidos" placeholder="Apellidos">
+                    <input type="text" class="form-control input-lg required" id="txtApellidos" placeholder="Apellidos">
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-12">
-                    <input type="email" class="form-control input-lg" id="txtCorreo" placeholder="Correo Electrónico">
+                    <input type="email" class="form-control input-lg required email" id="txtCorreo" placeholder="Correo Electrónico">
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-12">
-                    <input type="email" class="form-control input-lg" id="txtCorreoReescribe" placeholder="Ingresa nuevamente tu Correo Electrónico">
+                    <input type="email" class="form-control input-lg required email" id="txtCorreoReescribe" placeholder="Ingresa nuevamente tu Correo Electrónico">
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-12">
-                    <input type="password" class="form-control input-lg" id="txtContrasena" placeholder="Contraseña">
+                    <input type="password" class="form-control input-lg required" id="txtContrasena" placeholder="Contraseña">
                 </div>
             </div>
             <div class="row">
@@ -32,17 +32,9 @@
             </div>
             <div class="row">
                 <div class="form-group col-md-12">
-                    <button type="button" class="btn btn-success btn-lg pull-right">Registrarse</button>
+                    <button type="submit" class="btn btn-success btn-lg pull-right">Registrarse</button>
                 </div>
             </div>
         </form>
     </div>
 </div>
-<script type="text/javascript">
-    $(function(){
-        $(".hmoption .btn").click(function(){
-            $(".hmoption .btn").removeClass("active");
-            $(this).addClass("active");
-        });
-    })
-</script>

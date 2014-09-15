@@ -22,7 +22,7 @@ if (count($params["css"]) > 0) {
     }
 }
 ?>
-<link rel="stylesheet" type="text/css" href="<?= site_url("less/index/nav.less") ?>" />
+<link rel="stylesheet" type="text/css" href="<?= site_url("css/nav.css") ?>" />
 <?php
 if (count($params["css_after"]) > 0) {
     foreach ($params["css_after"] as $key => $sc) {
@@ -37,6 +37,7 @@ if (count($params["css_after"]) > 0) {
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="<?=  site_url("js/jq.form.validator.js")?>"></script>
 <?php
 if (isset($params["scripts"])) {
     if (count($params["scripts"]) > 0) {
