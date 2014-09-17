@@ -3,20 +3,20 @@
         <form role="form" class="form-group">
             <div class="row">
                 <div class="form-group col-md-6">
-                    <input type="text" class="form-control input-lg required" id="txtNombre" placeholder="Nombre">
+                    <input type="text" class="form-control input-lg required decimal" id="txtNombre" placeholder="Nombre">
                 </div>
                 <div class="form-group col-md-6">
-                    <input type="text" class="form-control input-lg required" id="txtApellidos" placeholder="Apellidos">
+                    <input type="text" class="form-control input-lg required decimal thousand" id="txtApellidos" placeholder="Apellidos">
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-12">
-                    <input type="email" class="form-control input-lg required email" id="txtCorreo" placeholder="Correo Electrónico">
+                    <input type="email" class="form-control input-lg required integer" id="txtCorreo" placeholder="Correo Electrónico">
                 </div>
             </div>
             <div class="row">
                 <div class="form-group col-md-12">
-                    <input type="email" class="form-control input-lg required email" id="txtCorreoReescribe" placeholder="Ingresa nuevamente tu Correo Electrónico">
+                    <input type="email" class="form-control input-lg required integer thousand" id="txtCorreoReescribe" placeholder="Ingresa nuevamente tu Correo Electrónico">
                 </div>
             </div>
             <div class="row">

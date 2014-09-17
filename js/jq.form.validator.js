@@ -16,7 +16,8 @@ $.fn.formValidator = function(df) {
         },
         msg: {
             "msgrequired": "{campo} field is mandatory",
-            "msginvalid": "{campo} field is invalid"
+            "msgformat": "{campo} field has wrong format",
+            "msginvalidchars": "{campo} hasn't admited characters"
         },
         settings: {
             "eol": "<br/>", //eol de linea
@@ -29,7 +30,11 @@ $.fn.formValidator = function(df) {
             }
         }
     };
-    df = jQuery.extend(settings, df);
+    df.validators = $.extend({}, settings.validators, df.validators);
+    df.chars = $.extend({}, settings.chars, df.chars);
+    df.msg = $.extend({}, settings.msg, df.msg);
+    df.settings = $.extend({}, settings.settings, df.settings);
+    df.events = $.extend({}, settings.events, df.events);
     /***************************************************************************
      preparación de variables ************************************************** 
      ***************************************************************************/
@@ -40,13 +45,6 @@ $.fn.formValidator = function(df) {
     $.each(df.validators, function(k, v) {
         df.validators[k] = ":input." + v;
     });
-    $.each(df.chars, function(k, v) {
-        clases_originales[k] = v;
-        df.chars[k] = ":input." + v;
-        charselector += "," + df.validators[k];
-    });
-    if (charselector.length > 0)
-        charselector = charselector.substr(1, charselector.length);
 
     var chars = new Object();
     chars.alpha = [];
@@ -65,16 +63,79 @@ $.fn.formValidator = function(df) {
             chars.lowercase.push(i);
         if ((i >= 0 && i <= 47) || (i >= 58 && i <= 64) || (i >= 91 && i <= 96) || (i >= 123 && i <= 126) || (i >= 158 && i <= 159) || (i >= 166 && i <= 180) || (i >= 184 && i <= 197) || (i >= 200 && i <= 208) || (i >= 217 && i <= 223) || (i >= 155 && i <= 159) || (i >= 238 && i <= 255))
             chars.special.push(i);
-        if ((i >= 48 && i <= 57) || i === String.fromCharCode(df.settings.sepdecimal))
+        if ((i >= 48 && i <= 57) || i === df.settings.sepdecimal.charCodeAt(0))
             chars.decimal.push(i);
         if ((i >= 48 && i <= 57))
             chars.entero.push(i);
-        if (i === String.fromCharCode(df.settings.sepmiles))
+        if (i === df.settings.sepmiles.charCodeAt(0))
             chars.thousand.push(i);
     }
 
+    $.each(df.chars, function(k, v) {
+        clases_originales[k] = v;
+        df.chars[k] = ":input." + v;
+        charselector += ",." + v;
+    });
+    if (charselector.length > 0)
+        charselector = charselector.substr(1, charselector.length);
+
+    getSelectionStart = function(o) {
+        if (o.createTextRange) {
+            var r = document.selection.createRange().duplicate();
+            r.moveEnd('character', o.value.length);
+            if (r.text === '') {
+                return o.value.length;
+            }
+            return o.value.lastIndexOf(r.text);
+        } else {
+            return o.selectionStart;
+        }
+    };
+
+    // Based on code from http://javascript.nwbox.com/cursor_position/ (Diego Perini <dperini@nwbox.com>)
+    getSelectionEnd = function(o) {
+        if (o.createTextRange) {
+            var r = document.selection.createRange().duplicate();
+            r.moveStart('character', -o.value.length);
+            return r.text.length;
+        } else
+            return o.selectionEnd;
+    };
+
+    // set the selection, o is the object (input), p is the position ([start, end] or just start)
+    setSelection = function(o, p) {
+        // if p is number, start and end are the same
+        if (typeof p === "number") {
+            p = [p, p];
+        }
+        ;
+        // only set if p is an array of length 2
+        if (p && p.constructor === Array && p.length === 2) {
+            if (o.createTextRange) {
+                var r = o.createTextRange();
+                r.collapse(true);
+                r.moveStart('character', p[0]);
+                r.moveEnd('character', p[1]);
+                r.select();
+            }
+            else if (o.setSelectionRange) {
+                o.focus();
+                o.setSelectionRange(p[0], p[1]);
+            }
+        }
+    };
+
     //$(formulario).on("change",".required, .email, .alpha, .mayusculas, .minusculas, .especial, .decimal, .integer, .thousand",function(){
-    valorneto = function(valor) {
+    valorneto = function(ctr) {
+        var valor = "";
+        if (ctr === null)
+            return true;
+        else {
+            if (typeof (ctr) === "object")
+                valor = $(ctr).val();
+            else
+                valor = ctr;
+        }
         return valor.split(" ").join("").split("\n").join("");
     };
 
@@ -106,16 +167,54 @@ $.fn.formValidator = function(df) {
         if (esentero) {
             re = /^\d+$/;
             if (miles) {
-                re = new RegExp("/^(\\d{0,3})(" + df.settings.sepmiles + "\\d{3})*$/");
+                re = new RegExp("^(\\d{1,3})(" + df.settings.sepmiles + "\\d{3})*$");
             }
         }
         else {
-            re = /^\d+\.\d{0,}$/;
+            re = new RegExp("^\\d+(\\" + df.settings.sepdecimal + "\\d{1,})?$");
             if (miles) {
-                re = new RegExp("/^(\\d{0,3})(" + df.settings.sepmiles + "\\d{3})*(\\" + df.settings.sepdecimal + "\\d{1,})?$/");
+                re = new RegExp("^(\\d{0,3})(" + df.settings.sepmiles + "\\d{3})*(\\" + df.settings.sepdecimal + "\\d{1,})?$");
             }
         }
         return re.test(valor);
+    };
+
+    validacaracteres = function(ctrl_v, elimina_chars) {
+        if (elimina_chars === null)
+            elimina_chars = false;
+        var carat = getSelectionStart(this);
+        var selectionEnd = getSelectionEnd(this);
+        //ctrl_v = this;
+        errores = [];
+        //el vector de caracteres válidos
+        vector_char = [];
+        $.each(clases_originales, function(k, v) {
+            if ($(ctrl_v).hasClass(v))
+                vector_char = vector_char.concat(chars[k]);
+        });
+        //valido caracteres
+        var pasaChar = true;
+        var txtOriginal = $(ctrl_v).val();
+        $.each($(ctrl_v).val().split(""), function(k, v) {
+            //por cada caracter veo si está en la lista de admitidos
+            if (vector_char.indexOf(v.toString().charCodeAt(0)) === -1) {
+                pasaChar = false;
+                if (elimina_char) {
+                    txtOriginal = txtOriginal.substring(0, k) + txtOriginal.substring(k + 1);
+                }
+            }
+        });
+        $(ctrl_v).val(txtOriginal);
+        setSelection(this, [carat, selectionEnd]);
+
+        if (!pasaChar) {
+            errores.push({
+                "objeto": $(ctrl_v).attr("id"),
+                "mensaje": df.msg.msginvalidchars.split("{campo}").join($(ctrl_v).attr(df.settings.fieldname))
+            });
+            validado = false;
+        }
+        return errores;
     };
 
     $(formulario).submit(function() {
@@ -139,7 +238,7 @@ $.fn.formValidator = function(df) {
             if (valorneto($(this).val()) !== "" && !validaEmail(this)) {
                 errores.push({
                     "objeto": $(this).attr("id"),
-                    "mensaje": df.msg.msginvalid.split("{campo}").join($(this).attr(df.settings.fieldname))
+                    "mensaje": df.msg.msgformat.split("{campo}").join($(this).attr(df.settings.fieldname))
                 });
                 validado = false;
             }
@@ -151,25 +250,9 @@ $.fn.formValidator = function(df) {
 
         //selecciono todos los input que necestan validar caracteres
         $(formulario).find(charselector).each(function() {
-            ctrl_v = this;
-            //el vector de caracteres válidos
-            vector_char = [];
-            $.each(clases_originales, function(k, v) {
-                if ($(ctrl_v).hasClass(v))
-                    vector_char = vector_char.concat(chars[k]);
-            });
-            //valido caracteres
-            var pasaChar = true;
-            $.each($(ctrl_v).val(), function(k, v) {
-                //por cada caracter veo si está en la lista de admitidos
-                if (vector_char.indexOf(v) === -1)
-                    pasaChar = false;
-            });
-            if (!pasaChar) {
-                errores.push({
-                    "objeto": $(ctrl_v).attr("id"),
-                    "mensaje": df.msg.msginvalid.split("{campo}").join($(ctrl_v).attr(df.settings.fieldname))
-                });
+            aux_errores = validacaracteres(this);
+            if (aux_errores.length > 0) {
+                errores.concat(aux_errores);
                 validado = false;
             }
         });
@@ -182,7 +265,7 @@ $.fn.formValidator = function(df) {
                 validado = false;
                 errores.push({
                     "objeto": $(ctrl_v).attr("id"),
-                    "mensaje": df.msg.msginvalid.split("{campo}").join(jQuery(ctrl_v).attr(df.settings.fieldname))
+                    "mensaje": df.msg.msgformat.split("{campo}").join(jQuery(ctrl_v).attr(df.settings.fieldname))
                 });
             }
 
@@ -194,7 +277,7 @@ $.fn.formValidator = function(df) {
                 validado = false;
                 errores.push({
                     "objeto": $(ctrl_v).attr("id"),
-                    "mensaje": df.msg.msginvalid.split("{campo}").join(jQuery(ctrl_v).attr(df.settings.fieldname))
+                    "mensaje": df.msg.msgformat.split("{campo}").join(jQuery(ctrl_v).attr(df.settings.fieldname))
                 });
             }
 
@@ -209,5 +292,17 @@ $.fn.formValidator = function(df) {
         }
         //$(formulario).find(df.validators)
     });
-
+    $(formulario).on("keyup", charselector, function(event) {
+        aux_errores = validacaracteres(this);
+        if (aux_errores.length > 0) {
+            event.preventDefault();
+        }
+    });
+    $(formulario).on("change", charselector, function(event) {
+        aux_errores = validacaracteres(this, true);
+        if (aux_errores.length > 0) {
+            errores.concat(aux_errores);
+            validado = false;
+        }
+    });
 };
